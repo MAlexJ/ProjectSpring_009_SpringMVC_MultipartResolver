@@ -11,22 +11,20 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 
 @Controller
-public class PhotoController extends BaseController {
+@RequestMapping(value = "/")
+public class PhotoController {
 
-
-    public static final String PARAM_LATESTPHOTO = "LATEST_PHOTO_PARAM";
-
-    @RequestMapping(value = "/uploadPhoto", method = RequestMethod.GET)
-    public String uploadPhotoForm(ModelMap model, HttpServletRequest request){
-        model.addAttribute(PARAM_BASE_URL, getBaseURL(request));
+    @RequestMapping( method = RequestMethod.GET)
+    public String get() {
         return "index";
     }
+
 
     @RequestMapping(value = "/uploadimgctlr", method = RequestMethod.POST)
     public String uploadImageCtlr(ModelMap model,
                                   HttpServletRequest request,
                                   @RequestParam MultipartFile file){
-        String latestUploadPhoto = "";
+
         String rootPath = request.getSession().getServletContext().getRealPath("/resources/");
         File dir = new File(rootPath + File.separator + "img");
         if (!dir.exists()) {
@@ -34,7 +32,7 @@ public class PhotoController extends BaseController {
         }
 
         File serverFile = new File(dir.getAbsolutePath() + File.separator + file.getOriginalFilename());
-        latestUploadPhoto = file.getOriginalFilename();
+        String latestUploadPhoto = file.getOriginalFilename();
 
         //write uploaded image to disk
         try {
@@ -51,10 +49,8 @@ public class PhotoController extends BaseController {
             System.out.println("error : " + e.getMessage());
         }
 
-        //send baseURL to jsp
-        model.addAttribute(PARAM_BASE_URL, getBaseURL(request));
         //send photo name to jsp
-        model.addAttribute(PARAM_LATESTPHOTO, latestUploadPhoto);
+        model.addAttribute("photo", latestUploadPhoto);
 
         return "index";
     }
